@@ -112,7 +112,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return request.user == obj
 
     def get_posts(self, obj):
-        from ..posts import PostSerializer  
+        from posts.serializers import PostSerializer  
         request = self.context.get('request') 
         return PostSerializer(obj.posts.all().order_by('-created_at'), many=True, context={'request': request}).data
 
