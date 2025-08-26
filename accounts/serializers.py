@@ -18,8 +18,10 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_photo(self, obj):
         request = self.context.get('request')
-        if obj.photo and hasattr(obj.photo, 'url'):
-            return request.build_absolute_uri(obj.photo.url)
+        if obj.photo:
+            if request:
+                return request.build_absolute_uri(obj.photo.url)
+            return obj.photo.url  # fallback
         return None
 
 
