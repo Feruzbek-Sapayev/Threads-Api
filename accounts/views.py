@@ -16,7 +16,7 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            user_data = UserSerializer(user, many=True, context={'request': request}).data
+            user_data = UserSerializer(user, context={'request': request}).data
             refresh = RefreshToken.for_user(user)
             return Response({
                 "message": "Foydalanuvchi muvaffaqiyatli yaratildi",
@@ -35,7 +35,7 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data["user"]
             refresh = RefreshToken.for_user(user)
-            user_data = UserSerializer(user, many=True, context={'request': request}).data
+            user_data = UserSerializer(user, context={'request': request}).data
             return Response({
                 "message": "Tizimga muvaffaqiyatli kirildi!",
                 "user": user_data,
