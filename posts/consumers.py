@@ -1,7 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import database_sync_to_async
-from models import Post
+from .models import Post
 
 class LikeCommentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -25,7 +25,7 @@ class LikeCommentConsumer(AsyncWebsocketConsumer):
 
             # barcha clientlarga yuborish
             await self.channel_layer.group_send(
-                "post_updates",
+                "realtime",
                 {
                     "type": "send_like",
                     "post_id": post_id,
