@@ -4,7 +4,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 import posts.routing
 from channels.auth import AuthMiddlewareStack
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'your_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Threads.settings')
 
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),

@@ -1,5 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import database_sync_to_async
+from models import Post
 
 class LikeCommentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -15,12 +17,19 @@ class LikeCommentConsumer(AsyncWebsocketConsumer):
         message_type = data.get("type")
 
         if message_type == "like":
+            post_id = data["post_id"]
+            post = await database_sync_to_async(Post.objects.get)(id=post_id)
+            # foydalanuvchi allaqachon like qilmaganini tekshirish
+            await database_sync_to_async(post.likes.add)(self.scope["user"])
+            like_count = await database_sync_to_async(lambda: post.likes.count())()
+
+            # barcha clientlarga yuborish
             await self.channel_layer.group_send(
-                "realtime",
+                "post_updates",
                 {
                     "type": "send_like",
-                    "like_count": data["like_count"],
-                    "post_id": data["post_id"],
+                    "post_id": post_id,
+                    "like_count": like_count
                 }
             )
         elif message_type == "comment":
@@ -36,9 +45,9 @@ class LikeCommentConsumer(AsyncWebsocketConsumer):
     async def send_like(self, event):
         await self.send(text_data=json.dumps({
             "type": "like",
-            "like_count": event["like_count"],
-            "post_id": event["post_id"]
-        }))
+            "post_id": event["post_id"],
+            "like_count": event["like_count"]
+    }))
 
     async def send_comment(self, event):
         await self.send(text_data=json.dumps({
